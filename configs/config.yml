@@ -1,0 +1,27 @@
+modelling:
+  timestep: 0.00002
+  duration: 0.2
+environment:
+  pressure: 101325
+  pressure_atm: 101325
+  kb: 1.380649e-23
+  drop_conc: 1.0e+9
+t_zero:
+  d_zero: 23.3315e-6
+  t_d_zero: 293
+  t_g_zero: 430
+  water_content_g_zero: 10657
+liquid:
+  rho_d: 1.0e+6
+  cp_d: 4.186
+  mm_d: 18
+  sigma_d: 2.641
+  eps_fact: 809.1
+  speed_d: 32
+gas_phase:
+  mm_g: 39.948
+  sigma_g: 3.542
+  eps_fact: 93.3
+  r: 8.314
+  speed_g: 32
+  
