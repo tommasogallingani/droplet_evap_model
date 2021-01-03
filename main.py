@@ -4,6 +4,7 @@ from path import Path
 import logging, logging.config
 import yaml
 import argparse
+import matplotlib.pyplot as plt
 
 
 def load_config(path: str) -> dict:
@@ -66,6 +67,25 @@ def eval_diff_coeff(t_layer, omega, sigma12, p, mm_g, mm_d, a=1.86e-3,b=3/2,c=1/
 def eval_vap_heat(t_d, a=-1.66282e-7, b= 2.53533e-4, c=-0.14657, d=35.23021, e=-434.96806):
     return a*(t_d)**4+b*(t_d)**3+c*(t_d)**2+d*(t_d)+e
 
+def eval_viscosity(t_layer, a, b):
+    return t_layer*a+b
+
+def eval_term(mu_g_g, mu_l_g, chi_vs, mm_g, mm_d):
+    return mu_l_g/(1+(1-chi_vs)/chi_vs*((1+((mu_l_g/mu_g_g)**0.5)*((mm_d/mm_g)**0.25))**2)/(2.83*(1+mm_d/mm_g)**0.5)**0.5)
+
+def eval_m_viscosity(mu_g_g, mu_l_g, chi_vs, mm_g, mm_d):
+    term_a = eval_term(mu_g_g, mu_l_g, chi_vs, mm_g, mm_d)
+    term_b = eval_term(mu_l_g, mu_g_g, 1-chi_vs, mm_d, mm_g)
+    return term_a+term_b
+
+def eval_cp(t_m, a, b, c, d, e, mm_x):
+    return (a+b*(t_m)/1000+c*((t_m)/1000)**2+d*(t_m/1000)**3+e/((t_m/1000)**2))/mm_x
+
+def eval_k(t_m, a, b, c):
+    return a*t_m**2+b*t_m+c
+
+def eval_phi(mu_g_g, mu_l_g, mm_g, mm_d):
+    return (1+(mu_g_g/mu_l_g)**0.5*(mm_d/mm_g)**0.25)**2/(np.sqrt(8)*(1+(mm_g/mm_d))**0.5)
 
 
 def initialize_params(sigma12, epsilon12, mass_g, config):
@@ -81,15 +101,81 @@ def initialize_params(sigma12, epsilon12, mass_g, config):
     arguments['rh'] = arguments['pvap_g']/arguments['psat_g']
     return arguments
 
-def evaluate_state(res_prec, sigma12, epsilon12, mass_g, kb, mm_g, mm_d, pressure):
-    res=dict.fromkeys(res_prec.keys())
+def evaluate_state(res_prec, sigma12, epsilon12, mass_g, kb, r, mm_g, mm_d, pressure, patm, boiling_t, u_g, u_d, timestep, cp_d):
+    res=res_prec.copy()
+    ## TODO Update liquid density as a function of temperature
     # eval layer temperature
     res['t_layer'] = layer_temp(res_prec['t_d'], res_prec['t_g'])
     res['kbtepsilon12'] = kb*res['t_layer'] /epsilon12
     res['omega'] = eval_omega(res['kbtepsilon12'])
     res['diff_vm'] = eval_diff_coeff(res['t_layer'], res['omega'], sigma12, pressure, mm_g, mm_d)
     res['vap_heat'] = eval_vap_heat(res_prec['t_d'])
+    # surface vapour molar fraction at surface
+    res['chi_vs'] = pressure/patm*np.exp(res['vap_heat']*mm_d/r*(1/boiling_t-1/res_prec['t_d']))
+    # surface vapour molar fraction in the gas
+    res['chi_gs'] = 1- res['chi_vs']
+    res['chi_vg'] = res_prec['pvap_g']/pressure
+    res['y_vg'] = res['chi_vg']*mm_d/(res['chi_vg']*mm_d+(1-res['chi_vg'])*mm_g) # vapour mass fraction in the gas
+    res['y_vs'] = res['chi_vs']*mm_d/(res['chi_vs']*mm_d+res['chi_gs']*mm_g) # vapour mass fraction at the surface
+    res['Bm'] = (res['y_vs'] - res['y_vg'])/(1-res['y_vs']) #Spalding mass transfer number
+    res['rho_g_g'] = pressure*mm_g/(r*res['t_layer'])
+    res['rho_l_g'] = pressure*mm_d/(r*res['t_layer'])
+    # average density
+    res['rho_m_g'] = res['rho_g_g']*(1-res['chi_vs']) + res['chi_vs']*res['rho_l_g']
 
+    # model convection
+    res['mu_g_g'] = eval_viscosity(res['t_layer'], a= 6.0971e-08,b =3.3267e-6)
+    res['mu_l_g'] = eval_viscosity(res['t_layer'], a= 4.7e-08,b =3.5333e-6)
+    # average viscosity
+    res['mu_m_g'] = eval_m_viscosity(res['mu_g_g'], res['mu_l_g'], res['chi_vs'], mm_g, mm_d)
+    # Reynold number
+    res['Red']=pressure/(r*res_prec['t_g'])*mm_g*res_prec['d_d']*np.abs(u_g-u_d)/res['mu_m_g']*1.0e-3
+    # Schmidt number at interface
+    res['Scm']=res['mu_m_g']/(res['rho_m_g']*res['diff_vm'])*1.0e7
+    # Sherwood number
+    res['Shm']=2+0.6*res['Red']**0.5*res['Scm']**(1/3)
+    res['FM'] = (1+res['Bm'])**0.7*np.log(1+res['Bm'])/res['Bm']
+    res['Shm_star']=2+(res['Shm']-2)/res['FM']
+    # Mass losses
+    res['md']=np.pi*res_prec['d_d']*1.0e-4*res['diff_vm']*res['rho_m_g']*res['Shm_star']*np.log(1+res['Bm'])
+    res['d_dt']=-2*res['md']/(np.pi*res_prec['rho_d']*(res_prec['d_d'])**2)
+    res['d_d'] = res_prec['d_d']+res['d_dt']*timestep
+    # Evaluate humidity and droplet temperature
+    res['cp_g_g'] = eval_cp(res['t_layer'],20.786, 2.82591e-07, -1.46419e-07, 1.09213e-08, -3.66137e-9, mm_g)
+    res['cp_l_g'] =  eval_cp(res['t_layer'], 30.092, 6.832514, 6.793435, -2.53448, 0.082139, mm_d)
+    res['cp_m_g'] = res['cp_l_g']*res['y_vs']+(1-res['y_vs'])*res['cp_g_g'] # Jg/K Heat capacity mix ## TODO check y_vs
+    res['k_g_g'] = eval_k(res['t_layer'], -2.9107e-05, 6.8089e-02, -1.5000e-01) # mW/mK thermal conductivity argon NIST with fitting excel
+    res['k_l_g'] = eval_k(res['t_layer'], 7.7500e-05, 2.2550e-02, 4.8150e+00) # mW/mK thermal conductivity vapour NIST with fitting excel
+    res['phi_g_g'] = eval_phi(res['mu_g_g'], res['mu_l_g'],mm_g, mm_d) # argon to vapour wilke mixture calculation
+    res['phi_l_g'] = eval_phi(res['mu_l_g'], res['mu_g_g'], mm_d, mm_g) # vapour to argon wilke mixture calculatio
+    res['k_m_g'] = res['chi_vs']*res['k_l_g']/((1-res['chi_vs'])*res['phi_l_g']+res['chi_vs'])+(1-res['chi_vs'])*res['k_g_g']/((res['chi_vs'])*res['phi_g_g']+1-res['chi_vs'])
+    # Thermal balance
+    res['beta'] = -res['md']*res['cp_m_g']/(2*np.pi*res['k_m_g']*1e-3*res['d_d'])
+    res['G'] = res['beta']/(np.exp(res['beta']-1)) # correction factor evaporation
+    # Prandtl number
+    res['Prm'] = res['mu_m_g']*res['cp_m_g']/(1.0e-3*res['k_m_g'])*1.0e3
+    # Nusselt number
+    res['Num'] = 2+0.6*res['Red']**0.5*res['Prm']**(1/3)
+    # Abramzon-Sirignano model
+    # Lewis number
+    res['Lem'] = res['k_m_g']*1.0e-3/(res['cp_m_g']*res['diff_vm']*1.0e-4*res['rho_m_g'])
+    res['PHI'] = (res['cp_l_g']/res['cp_g_g']*res['Shm']/res['Num'])/res['Lem']
+    res['Bt'] = (1+res['Bm'])**res['PHI']-1
+    res['FT'] = (1+res['Bt'])**0.7*(np.log(1+res['Bt']))/(res['Bt'])
+    res['Num_star']=2+(res['Num']-2)/res['FT']
+    res['G_star'] = np.log(1+res['Bt'])/res['Bt']
+    # sensible heat transfer for droplet temperature change
+    res['Qs'] = res['G_star']*np.pi*res['d_d']*res['Num_star']*1.0e-3*res['k_m_g']*(res['t_g']-res['t_d'])-res['md']*res['vap_heat'] # W
+    # Temperature delta in droplet
+    res['dT_dt'] = 6*res['Qs']/((res['d_d']**3)*np.pi*res['rho_d']*cp_d) # K/s
+    res['deltaT'] = res['dT_dt']*timestep; # K/step
+    res['t_d'] = res_prec['t_d']+res['deltaT']
+
+    # Taking into account the change of humidity due to evaporation
+    res['ppm'] = (res_prec['ppm']*mass_g+res['md']*1.0e6*timestep)/mass_g
+    res['pvap_g'] = vap_pressure_g(res['ppm'], pressure, mm_g, mm_d)
+    res['psat_g']= sat_pressure_g(res['t_g'])
+    res['rh'] = res['pvap_g']/res['psat_g']
     return res
 
 def model_evap(config):
@@ -99,7 +185,27 @@ def model_evap(config):
     time=int(np.floor(config['modelling']['duration']/config['modelling']['timestep']))
     res[0] = arguments
     for t in range(1, time):
-        res[t] = evaluate_state(res[t-1], sigma12, epsilon12, mass_g, config['environment']['kb'], config['gas_phase']['mm_g'], config['liquid']['mm_d'], config['environment']['pressure'])
+        res[t] = evaluate_state(res[t-1], sigma12, epsilon12, mass_g, config['environment']['kb'],config['gas_phase']['r'],
+                                config['gas_phase']['mm_g'], config['liquid']['mm_d'], config['environment']['pressure'], config['environment']['pressure_atm'],
+                                config['liquid']['boiling_t'],config['gas_phase']['speed_g'], config['liquid']['speed_d'], config['modelling']['timestep'],
+                                config['liquid']['cp_d'])
+        if res[t-1]['d_d']<=0 or res[t-1]['d_d']==np.nan:
+            break
+        print(res[t]['d_d'])
+
+
+    time=[]
+    diameter=[]
+    temp = []
+    for key, val in res.items():
+        time.append(config['modelling']['timestep']*key)
+        diameter.append(val['d_d'])
+        temp.append(val['t_d'])
+    plt.scatter(x=time, y=diameter)
+    plt.show()
+    plt.figure()
+    plt.scatter(x=time, y=temp)
+    plt.show()
 
 def main(args):
 
