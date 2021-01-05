@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import os
+from datetime import datetime
 from path import Path
 import logging
 import logging.config
@@ -242,29 +244,43 @@ def model_evap(config):
                 print(k, v, t)
         if res[t]['d_d'] <= 0 or res[t]['d_d'] == np.nan or res[t]['t_d'] <= 0:
             break
-    time = []
-    diameter = []
-    temp = []
-    ppm = []
-    for key, val in res.items():
-        time.append(config['modelling']['timestep']*key)
-        diameter.append(val['d_d'])
-        temp.append(val['t_d'])
-        ppm.append(val['ppm'])
-    fig, ax = plt.subplots(3, 1, figsize=(25,10))
-    ax[0].scatter(x=time, y=diameter, label='Diameter m')
-    ax[0].set_ylim((0, max(diameter)))
-    ax1 = ax[0].twinx()
-    ax1.scatter(x=time, y=temp, c='k', label='Droplet temperature K')
-    ev_c = -np.diff(np.power(np.array(diameter), 2))/config['modelling']['timestep']
-    ax[1].scatter(x=time[1:], y=ev_c, c='r', label='Evaporation constant')
-    ax[1].set_ylim((0, max(ev_c)))
-    ax2 = ax[1].twinx()
-    ax2.scatter(x=time, y=ppm, c='g', label='Water content ppm')
-    ax[2].scatter(x=time, y=np.power(np.array(diameter), 2), c='y', label='D-square')
-    ax[2].set_ylim((0, max(np.power(np.array(diameter), 2))))
-    fig.legend()
-    plt.show(block=True)
+    if config['output']['plotting'] or config['output']['csv']:
+        now = datetime.now()
+        dt_string = now.strftime("%Y%m%d_%H%M%S")
+        directory = 'res'+dt_string
+        if not os.path.exists(os.path.join('output',directory)):
+            os.makedirs(os.path.join('output',directory))
+        with open(os.path.join('output',directory,'config.yml'), 'w') as outfile:
+            yaml.dump(config, outfile, default_flow_style=False)
+    if config['output']['plotting']:
+        time = []
+        diameter = []
+        temp = []
+        ppm = []
+        for key, val in res.items():
+            time.append(config['modelling']['timestep']*key)
+            diameter.append(val['d_d'])
+            temp.append(val['t_d'])
+            ppm.append(val['ppm'])
+        fig, ax = plt.subplots(3, 1, figsize=(25,10))
+        ax[0].scatter(x=time, y=diameter, label='Diameter m')
+        ax[0].set_ylim((0, max(diameter)))
+        ax1 = ax[0].twinx()
+        ax1.scatter(x=time, y=temp, c='k', label='Droplet temperature K')
+        ev_c = -np.diff(np.power(np.array(diameter), 2))/config['modelling']['timestep']
+        ax[1].scatter(x=time[1:], y=ev_c, c='r', label='Evaporation constant')
+        ax[1].set_ylim((0, max(ev_c)))
+        ax2 = ax[1].twinx()
+        ax2.scatter(x=time, y=ppm, c='g', label='Water content ppm')
+        ax[2].scatter(x=time, y=np.power(np.array(diameter), 2), c='y', label='D-square')
+        ax[2].set_ylim((0, max(np.power(np.array(diameter), 2))))
+        fig.legend()
+        plt.show(block=True)
+        fig.savefig(os.path.join('output',directory,'plots.png'), dpi=300)
+    if config['output']['csv']:
+        df = pd.DataFrame.from_dict(res, orient='index')
+        df['time'] = df.index*config['modelling']['timestep']
+        df.to_csv(os.path.join('output',directory,'res.csv'))
 
 
 def main(args):
