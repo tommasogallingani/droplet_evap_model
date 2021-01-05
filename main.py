@@ -8,6 +8,7 @@ import logging.config
 import yaml
 import argparse
 import matplotlib.pyplot as plt
+import tqdm
 
 
 def load_config(path: str) -> dict:
@@ -125,7 +126,19 @@ def initialize_params(sigma12, epsilon12, mass_g, config):
     return arguments
 
 
-def evaluate_state(res_prec, sigma12, epsilon12, mass_g, kb, r, mm_g, mm_d, pressure, patm, boiling_t, u_g, u_d, timestep, cp_d):
+def evaluate_state(res_prec, sigma12, epsilon12, mass_g, config):
+    kb = config['environment']['kb']
+    r = config['gas_phase']['r']
+    mm_g =  config['gas_phase']['mm_g']
+    mm_d = config['liquid']['mm_d']
+    pressure = config['environment']['pressure']
+    patm = config['environment']['pressure_atm']
+    boiling_t = config['liquid']['boiling_t']
+    u_g = config['gas_phase']['speed_g']
+    u_d = config['liquid']['speed_d']
+    timestep = config['modelling']['timestep']
+    cp_d = config['liquid']['cp_l']
+                                
     res = res_prec.copy()
     # TODO Update liquid density as a function of temperature
     # eval layer temperature
@@ -155,8 +168,8 @@ def evaluate_state(res_prec, sigma12, epsilon12, mass_g, kb, r, mm_g, mm_d, pres
         (1-res['chi_vs']) + res['chi_vs']*res['rho_l_g']
 
     # model convection
-    res['mu_g_g'] = eval_viscosity(res['t_layer'], a=6.0971e-08, b=3.3267e-6)
-    res['mu_l_g'] = eval_viscosity(res['t_layer'], a=4.7e-08, b=3.5333e-6)
+    res['mu_g_g'] = eval_viscosity(res['t_layer'], a=config['gas_phase']['viscosity_a'], b=config['gas_phase']['viscosity_b'])
+    res['mu_l_g'] = eval_viscosity(res['t_layer'], a=config['liquid']['viscosity_a'], b=config['liquid']['viscosity_b'])
     # average viscosity
     res['mu_m_g'] = eval_m_viscosity(
         res['mu_g_g'], res['mu_l_g'], res['chi_vs'], mm_g, mm_d)
@@ -176,15 +189,14 @@ def evaluate_state(res_prec, sigma12, epsilon12, mass_g, kb, r, mm_g, mm_d, pres
     res['d_d'] = res_prec['d_d']+res['d_dt']*timestep
     # Evaluate humidity and droplet temperature
     res['cp_g_g'] = eval_cp(
-        res['t_layer'], 20.786, 2.82591e-07, -1.46419e-07, 1.09213e-08, -3.66137e-9, mm_g)
-    res['cp_l_g'] = eval_cp(res['t_layer'], 30.092,
-                            6.832514, 6.793435, -2.53448, 0.082139, mm_d)
+        res['t_layer'], config['gas_phase']['cp_a'], config['gas_phase']['cp_b'], config['gas_phase']['cp_c'], config['gas_phase']['cp_d'], config['gas_phase']['cp_e'], mm_g)
+    res['cp_l_g'] = eval_cp(res['t_layer'], config['liquid']['cp_a'], config['liquid']['cp_b'], config['liquid']['cp_c'], config['liquid']['cp_d'], config['liquid']['cp_e'], mm_d)
     # Jg/K Heat capacity mix ## TODO check y_vs
     res['cp_m_g'] = res['cp_l_g']*res['y_vs']+(1-res['y_vs'])*res['cp_g_g']
     # mW/mK thermal conductivity argon NIST with fitting excel
-    res['k_g_g'] = eval_k(res['t_layer'], -2.9107e-05, 6.8089e-02, -1.5000e-01)
+    res['k_g_g'] = eval_k(res['t_layer'], config['gas_phase']['k_a'], config['gas_phase']['k_b'],  config['gas_phase']['k_c'])
     # mW/mK thermal conductivity vapour NIST with fitting excel
-    res['k_l_g'] = eval_k(res['t_layer'], 7.7500e-05, 2.2550e-02, 4.8150e+00)
+    res['k_l_g'] = eval_k(res['t_layer'], config['liquid']['k_a'], config['liquid']['k_b'],  config['liquid']['k_c'])
     # argon to vapour wilke mixture calculation
     res['phi_g_g'] = eval_phi(res['mu_g_g'], res['mu_l_g'], mm_g, mm_d)
     # vapour to argon wilke mixture calculatio
@@ -225,25 +237,25 @@ def evaluate_state(res_prec, sigma12, epsilon12, mass_g, kb, r, mm_g, mm_d, pres
     return res
 
 
-def model_evap(config):
+def model_evap(config, logger):
     sigma12, epsilon12, mass_g = eval_const(config)
+    logger.info('Completed evaluation of constants')
     res = {}
     arguments = initialize_params(sigma12, epsilon12, mass_g, config)
-    time = int(np.floor(config['modelling']
-                        ['duration']/config['modelling']['timestep']))
+    logger.info('Completed initialization of t_zero state')
     res[0] = arguments
-    for t in range(1, time):
-        res[t] = evaluate_state(res[t-1], sigma12, epsilon12, mass_g, config['environment']['kb'], config['gas_phase']['r'],
-                                config['gas_phase']['mm_g'], config['liquid']['mm_d'], config[
-                                    'environment']['pressure'], config['environment']['pressure_atm'],
-                                config['liquid']['boiling_t'], config['gas_phase']['speed_g'], config[
-                                    'liquid']['speed_d'], config['modelling']['timestep'],
-                                config['liquid']['cp_d'])
+    max_it = int(config['modelling']['max_iteration'])
+    logger.info('Starting modelling')
+    for t in tqdm.tqdm(range(1, max_it)):
+        res[t] = evaluate_state(res[t-1], sigma12, epsilon12, mass_g, config)
         for k, v in res[t].items():
             if isinstance(v, complex):
-                print(k, v, t)
+                logger.warning(f"Found complex res for {k} variable at iteration {t} and timestamp {t*config['modelling']['timestep']}")
         if res[t]['d_d'] <= 0 or res[t]['d_d'] == np.nan or res[t]['t_d'] <= 0:
+            logger.info(f'Estimated evaporation time of {t*config["modelling"]["timestep"]} seconds')
             break
+        if t==max_it-1:
+            logger.warning('Maximum number of iteration reached')
     if config['output']['plotting'] or config['output']['csv']:
         now = datetime.now()
         dt_string = now.strftime("%Y%m%d_%H%M%S")
@@ -252,7 +264,13 @@ def model_evap(config):
             os.makedirs(os.path.join('output',directory))
         with open(os.path.join('output',directory,'config.yml'), 'w') as outfile:
             yaml.dump(config, outfile, default_flow_style=False)
+    if config['output']['csv']:
+        logger.info(f'Saving results to csv')
+        df = pd.DataFrame.from_dict(res, orient='index')
+        df['time'] = df.index*config['modelling']['timestep']
+        df.to_csv(os.path.join('output',directory,'res.csv'))
     if config['output']['plotting']:
+        logger.info(f'Saving plots')
         time = []
         diameter = []
         temp = []
@@ -275,12 +293,11 @@ def model_evap(config):
         ax[2].scatter(x=time, y=np.power(np.array(diameter), 2), c='y', label='D-square')
         ax[2].set_ylim((0, max(np.power(np.array(diameter), 2))))
         fig.legend()
-        plt.show(block=True)
         fig.savefig(os.path.join('output',directory,'plots.png'), dpi=300)
-    if config['output']['csv']:
-        df = pd.DataFrame.from_dict(res, orient='index')
-        df['time'] = df.index*config['modelling']['timestep']
-        df.to_csv(os.path.join('output',directory,'res.csv'))
+        plt.draw()
+        plt.show()
+        
+
 
 
 def main(args):
@@ -292,7 +309,13 @@ def main(args):
     )
     logger.info('Loading config data')
     config = load_config(args.config)
-    model_evap(config)
+    if args.gas_type is not None:
+        logger.info('Gas parameters will be taken from csv database file')
+        config['gas_phase'] = pd.read_csv(os.path.join(args.data_path,'gas.csv'), index_col='property')[args.gas_type].to_dict()
+    if args.liq_type is not None:
+        logger.info('Liquid parameters will be taken from csv database file')
+        config['liquid'] = pd.read_csv(os.path.join(args.data_path,'liq.csv'), index_col='property')[args.liq_type].to_dict()
+    model_evap(config, logger)
 
 
 if __name__ == '__main__':
@@ -303,6 +326,21 @@ if __name__ == '__main__':
         '--config',
         help='config path',
         default='configs/config.yml'
+    )
+    parser.add_argument(
+        '--gas_type',
+        help='gas type',
+        default='Ar'
+    )
+    parser.add_argument(
+        '--liq_type',
+        help='liquid type',
+        default='H2O'
+    )
+    parser.add_argument(
+        '--data_path',
+        help='data path',
+        default='configs'
     )
     parser.add_argument(
         '--log_level',
