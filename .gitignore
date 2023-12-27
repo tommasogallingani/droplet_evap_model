@@ -15,4 +15,7 @@ build/
 
 # JetBrains IDE
 .idea/
+
+# Output
 tutorial/output/*
+output/*

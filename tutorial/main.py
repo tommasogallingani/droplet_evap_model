@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 from datetime import datetime
-from path import Path
+from pathlib import Path
 import logging
 import logging.config
 import yaml
