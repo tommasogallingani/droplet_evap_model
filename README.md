@@ -22,9 +22,7 @@ pip install -e .
 
 The 0-D model used for the simulation of a single droplet evaporation was developed according to a diffusion model based on mass and energy balance well reported in literature [[1]](#1) [[2]](#2), following the classical evaporation model (CEM) proposed by Spalding [[3]](#3) and Godsave [[4]](#4). This model was further improved following Abramzon-Sirignano approach [[5]](#5) [[6]](#6), that enabled a better account for advective mass and energy transport. A detailed description of the governing equations and limitations of this model was recently reviewed by Pinheiro et al. [[7]](#7). Mass and energy balances can be described according to following equations, respectively:
 
-$
-\frac{{d m_d}}{{dt}} = -\dot{m}_d
-$
+$\frac{{d m_d}}{{dt}} = -\dot{m}_d$
 
 $m_d \cdot c_{p_l} \frac{{dT_d}}{{dt}} = -Q_s$
 
@@ -32,15 +30,11 @@ where $m_d$ is the droplet mass, $\dot{m}_d$ is the mass evaporation rate, $c_{p
 
 Balance can be rewritten as a function of droplet diameter $D_d$, under the hypothesis of a spherical and homogeneous droplet:
 
-$
-\frac{{dD_d}}{{dt}} = -\frac{{2 \dot{m}_d}}{{\pi \rho_l D_d^2}} \quad (3)
-$
+$\frac{{dD_d}}{{dt}} = -\frac{{2 \dot{m}_d}}{{\pi \rho_l D_d^2}} \quad (3)$
 
 According to the CEM model, widely discussed and applied in different fields of research to study droplet evaporation, based on mass and energy balance evaporation flow rate can be described according to the following equation:
 
-$
-\dot{m}_d = \pi D_d D_{vm} \rho_m Sh_m \ln(1 + B_M) \quad (4)
-$
+$\dot{m}_d = \pi D_d D_{vm} \rho_m Sh_m \ln(1 + B_M) \quad (4)$
 
 where $D_v$ is the vapor diffusion coefficient, $\rho$ is the density, $Sh$ is the Sherwood number, and $B_M$ is the Spalding mass transfer number. It’s worth mentioning that all the physical properties were calculated in the region of gas-vapor film, considering the presence of both gas and water vapor species. Moreover, as described below, the temperature effect on the value of physical properties was included.
 
@@ -49,99 +43,63 @@ where $D_v$ is the vapor diffusion coefficient, $\rho$ is the density, $Sh$ is t
 
 The Spalding mass transfer number can be calculated using Equation (5):
 
-$
-B_M = \frac{{Y_{vs} - Y_{vg}}}{{1 - Y_{vs}}} \quad (5)
-$
+$B_M = \frac{{Y_{vs} - Y_{vg}}}{{1 - Y_{vs}}} \quad (5)$
 
 where $Y_{vs}$ and $Y_{vg}$ refer to vapor mass fraction at the droplet-gas interface and in the environment away from the droplet surface, respectively. While $Y_{vg}$ can be calculated using the known vapor content in the gas phase far away from the droplet surface, $Y_{vs}$ can be determined applying the classical ideal gas law (Equation (6)) under the assumption of liquid-vapor thermodynamic equilibrium at the droplet interface (Raoult’s and Clausius-Clapeyron’s laws, Equation (7)):
 
-$
-Y_{vs} = \frac{{\chi_{vs} W_v}}{{\chi_{vs} W_v + \chi_{gs} W_g}} \quad (6)
-$
+$Y_{vs} = \frac{{\chi_{vs} W_v}}{{\chi_{vs} W_v + \chi_{gs} W_g}} \quad (6)$
 
-$
-\chi_{vs}^{eq} = \frac{{p_{sat}}}{{p_g}} = \frac{{p_{atm}}}{{p_g}} \exp\left(\frac{{L_v M_v}}{{R}} \left(\frac{1}{{T_b}} - \frac{1}{{T_d}}\right)\right) \quad (7)
-$
+$\chi_{vs}^{eq} = \frac{{p_{sat}}}{{p_g}} = \frac{{p_{atm}}}{{p_g}} \exp\left(\frac{{L_v M_v}}{{R}} \left(\frac{1}{{T_b}} - \frac{1}{{T_d}}\right)\right) \quad (7)$
 
 where $\chi_{vs}$ and $\chi_{gs}$ are respectively the surface vapor and gas mass fraction of the liquid-gas mixture, $M_v$ is the vapor molar mass fraction, $W_g$ is the gas molar mass, $L_v$ is the enthalpy of vaporization of the liquid droplet, $p_g$ is the gas pressure, $R$ is the gas constant, and $T_b$ is the liquid boiling temperature at standard condition.
 
 Sherwood number ($Sh$) accounts for the increase of mass transfer due to gas motion and droplet slip velocity through Reynolds ($Re$) and Schmidt ($Sc$) numbers. According to Ranz-Marshall empirical correlation [[8]](#8), $Sh$ number can be evaluated using Equation (8):
 
-$
-Sh_m = 2 + Re_d^{1/2} Sc_m^{1/3} \quad (8)
-$
+$Sh_m = 2 + Re_d^{1/2} Sc_m^{1/3} \quad (8)$
 
 where
 
-$
-Re_d = \frac{{\rho_g D_d |u_g - u_d|}}{{\mu_m}} \quad (9)
-$
+$Re_d = \frac{{\rho_g D_d |u_g - u_d|}}{{\mu_m}} \quad (9)$
 
-$
-Sc_m = \frac{{\mu_m}}{{\rho_m D_{vm}}} \quad (10)
-$
+$Sc_m = \frac{{\mu_m}}{{\rho_m D_{vm}}} \quad (10)$
 
 and $\rho_g$ is the gas density, $u_g$ and $u_d$ are the gas and droplet velocity respectively, and $\mu_m$ is the dynamic viscosity calculated for the gas-vapor mix.
 
 The mass and energy transfer between gas and droplets at the interface is usually taken into account using a correction factor $G$, as discussed by El Wakil et al [[9]](#9). Concerning the energy balance, already reported in Equation (2), it should be mentioned that only part ($Q_s$) of the total energy received from the environment ($Q_d$) contributes to the droplet temperature increase. Indeed, part of the energy contributes to the evaporation of the liquid ($Q_l$), limiting the droplet temperature increase. Following what is reported in [[7]](#7), the energy balance can be rewritten as a function of gas temperature ($T_g$) as follows:
 
-$
-Q_s = Q_d - Q_l = G\pi D_d Nu_m k_m (T_g - T_d) - L_v \dot{m}_d \quad (11)
-$
+$Q_s = Q_d - Q_l = G\pi D_d Nu_m k_m (T_g - T_d) - L_v \dot{m}_d \quad (11)$
 
 Where Nusselt number ($Nu$) can be calculated using Prandtl number ($Pr$) instead of Sc number in Equation (8), using the specific heat capacity ($c_{p_m}$) and the thermal conductivity ($k_m$) of the gas-vapor mixture:
 
-$
-Pr_m = \frac{{\mu_m c_{p_m}}}{{k_m}} \quad (12)
-$
+$Pr_m = \frac{{\mu_m c_{p_m}}}{{k_m}} \quad (12)$
 
 The correction factor $G$ can be expressed as a function of a non-dimensional evaporation parameter $\beta$:
 
-$
-G = \frac{\beta}{{e^\beta - 1}} \quad (13)
-$
+$G = \frac{\beta}{{e^\beta - 1}} \quad (13)$
 
-$
-\beta = -\frac{\dot{m}_d c_{p_m}}{2\pi k_m D_d} \quad (14)
-$
+$\beta = -\frac{\dot{m}_d c_{p_m}}{2\pi k_m D_d} \quad (14)$
 
 As detailed in several publications by Abramzon and Sirignano [[5]](#5) [[6]](#6), a more realistic approach can be used taking more precisely into account mass and energy transport. In this perspective, modification to the CEM model was carried out using two different correction factors ($F_M$ and $F_T$), based on the film theory considering the effect of Stefan’s flows at the liquid-gas interface.
 
-$
-F_M = \left(1 + B_M\right)^{0.7} \frac{\ln(1 + B_M)}{B_M} \quad (15)
-$
+$F_M = \left(1 + B_M\right)^{0.7} \frac{\ln(1 + B_M)}{B_M} \quad (15)$
 
-$
-F_T = \left(1 + B_T\right)^{0.7} \frac{\ln(1 + B_T)}{B_T} \quad (16)
-$
+$F_T = \left(1 + B_T\right)^{0.7} \frac{\ln(1 + B_T)}{B_T} \quad (16)$
 
 Where $B_T$ is the Spalding thermal energy transfer number calculated according to the following equations:
 
-$
-B_T = \left(1 + B_M\right)^\phi \quad (17)
-$
+$B_T = \left(1 + B_M\right)^\phi \quad (17)$
 
-$
-\phi = \frac{c_{p_v}/c_{p_g} \cdot Sh/Nu \cdot 1/\text{Le}_m} \quad (18)
-$
+$\phi = \frac{c_{p_v}/c_{p_g} \cdot Sh/Nu \cdot 1/\text{Le}_m} \quad (18)$
 
-$
-\text{Le}_m = \frac{{k_m}}{{c_{p_m} D_{vm} \rho_m}} \quad (19)
-$
+$\text{Le}_m = \frac{{k_m}}{{c_{p_m} D_{vm} \rho_m}} \quad (19)$
 
 where $\text{Le}$ is Lewis number. The corrected value of $G$, $Sh^*$ and $Nu^*$ numbers that should be employed in Abramzon-Sirignano model are reported in the following equations:
 
-$
-Sh^* = 2 + \frac{{Sh_0 - 2}}{{F_M}} \quad (20)
-$
+$Sh^* = 2 + \frac{{Sh_0 - 2}}{{F_M}} \quad (20)$
 
-$
-Nu^* = 2 + \frac{{Nu_0 - 2}}{{F_T}} \quad (21)
-$
+$Nu^* = 2 + \frac{{Nu_0 - 2}}{{F_T}} \quad (21)$
 
-$
-G^* = \frac{\ln(1 + B_T)}{B_T} \quad (22)
-$
+$G^* = \frac{\ln(1 + B_T)}{B_T} \quad (22)$
 
 ## Gas, Vapor, and Liquid Properties
 
@@ -149,15 +107,11 @@ As mentioned above, the physical properties of the gas, liquid, and gas-vapor mi
 
 In the droplet proximity, gas-vapor properties can be described according to the film theory. A brief schematic representation of the droplet-gas environment and the “film region” is reported in Figure 4.3, where $T$ is the temperature and $Y$ is the vapor mass fraction. As reported by Hubbard et al. [[10]](#10) and Yuen and Chen [[11]](#11), temperature and other physical properties can be approximated using an averaging procedure (Equation (23)), where the weighting coefficient ($\alpha$) is 1/3 [[7]](#7).
 
-$
-T_m = T_s + \alpha (T_g - T_s) \quad (23)
-$
+$T_m = T_s + \alpha (T_g - T_s) \quad (23)$
 
 Vapor diffusion coefficient ($D_{vm}, \, \text{cm}^2/\text{s}$) were calculated following the approach reported by Cussler [[12]](#12) and proposed by Chapman and Enskog:
 
-$
-D_{vm} = \frac{{1.86 \times 10^{-3} T_m^{3/2} \left(\frac{1}{M_{Ar}} + \frac{1}{M_v}\right)}}{{p \times \sigma_{12} \times \Omega}} \quad (24)
-$
+$D_{vm} = \frac{{1.86 \times 10^{-3} T_m^{3/2} \left(\frac{1}{M_{Ar}} + \frac{1}{M_v}\right)}}{{p \times \sigma_{12} \times \Omega}} \quad (24)$
 
 where $p$ is the process pressure in atm, $\sigma_{12}$ is the collisional diameter in Å, while $\Omega$ is a dimensionless factor that can be described according Lennard–Jones 12-6 potential. The temperature dependence of all these factors was taken into account by fitting the data reported in [[12]](#12) (Table 5.1-2, 5.1-3) for different temperature values.
 
@@ -171,9 +125,7 @@ In this perspective, droplet concentration can be obtained using scanning mobili
 
 Under the hypothesis, the gas mass for each volume unit ($mass_{Ar}$) can be calculated using the gas ideal law. For each time step of the simulation ($\Delta t$), water content ($\text{ppm}_i$) was updated considering the initial vapor concentration ($\text{ppm}_0$) and the mass evaporated from the droplet ($m_d$), as reported in Equation (25).
 
-$
-\text{ppm}_1 = \frac{{\text{ppm}_0 \cdot mass_{Ar} + m_d \cdot 10^6 \cdot \Delta t}}{{mass_{Ar}}} \quad \text{for } i=1 \ldots n  \quad (24) 
-$
+$\text{ppm}_1 = \frac{{\text{ppm}_0 \cdot mass_{Ar} + m_d \cdot 10^6 \cdot \Delta t}}{{mass_{Ar}}} \quad \text{for } i=1 \ldots n  \quad (24) $
 
 ## Assumptions and Limitation of the Simulative Model
 
@@ -187,9 +139,7 @@ Firstly, the gas temperature during evaporation and droplet transport inside the
 According to literature, the heat transfer resistance inside an evaporating droplet is usually assumed to be negligible. To support this point, we compare the heat transfer resistance inside and outside the evaporating droplet using the Biot number ($Bi$). $Bi$ is a dimensionless number described as the ratio between the heat transfer inside the droplet and at the droplet surface. If $Bi$ < 1, then the internal body thermal resistance can be neglected, and the temperature field can be considered uniform. $Bi$ can be defined according to following equation and expressed as a function of $Nu$, introduced above:
 
 
-$
-\text{Bi} = \frac{L_0 \cdot h}{k_l} = \frac{\text{Nu}_m \cdot k_m}{k_l} \quad (25)
-$
+$\text{Bi} = \frac{L_0 \cdot h}{k_l} = \frac{\text{Nu}_m \cdot k_m}{k_l} \quad (25)$
 
 
 where $ L_0 $ is the characteristic length (r/3 for a sphere), $ h $ is the film heat transfer coefficient (W/m²K), and $ k_l $ is the thermal conductivity of the droplet. Even if all terms are temperature-dependent, the value of the Bi number is slightly affected by small thermal gradients. Indeed, at 293 K, the $Bi$ number for the tested condition is 0.066, significantly lower than 1. This result, in line with what has been already reported in literature [[9]](#9), outlines that the temperature gradient is much higher in the film region than in the droplet bulk, confirming that we can describe the droplet as a solid sphere with infinite thermal conductance.
