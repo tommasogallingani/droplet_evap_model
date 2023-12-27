@@ -26,7 +26,7 @@ $\frac{{d m_d}}{{dt}} = -\dot{m}_d$
 
 $m_d \cdot c_{p_l} \frac{{dT_d}}{{dt}} = -Q_s$
 
-where $m_d$ is the droplet mass, $\dot{m}_d$ is the mass evaporation rate, $c_{p_l}$ is the specific heat capacity of the liquid droplet, $T_d$ is the droplet temperature, and $Q_s$ is the net power transferred from the environment which contributes to droplet temperature increase.
+where $m_d$ is the droplet mass, $\dot{m}_d$ is the mass evaporation rate, $`c_{p_l}`$ is the specific heat capacity of the liquid droplet, $T_d$ is the droplet temperature, and $Q_s$ is the net power transferred from the environment which contributes to droplet temperature increase.
 
 Balance can be rewritten as a function of droplet diameter $D_d$, under the hypothesis of a spherical and homogeneous droplet:
 
@@ -77,7 +77,7 @@ The correction factor $G$ can be expressed as a function of a non-dimensional ev
 
 $G = \frac{\beta}{{e^\beta - 1}} \quad (13)$
 
-$\beta = -\frac{\dot{m}_d c_{p_m}}{2\pi k_m D_d} \quad (14)$
+$`\beta = -\frac{\dot{m}_d c_{p_m}}{2\pi k_m D_d} \quad (14)`$
 
 As detailed in several publications by Abramzon and Sirignano [[5]](#5) [[6]](#6), a more realistic approach can be used taking more precisely into account mass and energy transport. In this perspective, modification to the CEM model was carried out using two different correction factors ($F_M$ and $F_T$), based on the film theory considering the effect of Stefan’s flows at the liquid-gas interface.
 
@@ -91,7 +91,7 @@ $B_T = \left(1 + B_M\right)^\phi \quad (17)$
 
 $\phi = \frac{c_{p_v}/c_{p_g} \cdot Sh/Nu \cdot 1/\text{Le}_m} \quad (18)$
 
-$\text{Le}_m = \frac{{k_m}}{{c_{p_m} D_{vm} \rho_m}} \quad (19)$
+$`\text{Le}_m = \frac{{k_m}}{{c_{p_m} D_{vm} \rho_m}} \quad (19)`$
 
 where $\text{Le}$ is Lewis number. The corrected value of $G$, $Sh^*$ and $Nu^*$ numbers that should be employed in Abramzon-Sirignano model are reported in the following equations:
 
@@ -111,7 +111,7 @@ $T_m = T_s + \alpha (T_g - T_s) \quad (23)$
 
 Vapor diffusion coefficient ($D_{vm}, \, \text{cm}^2/\text{s}$) were calculated following the approach reported by Cussler [[12]](#12) and proposed by Chapman and Enskog:
 
-$D_{vm} = \frac{{1.86 \times 10^{-3} T_m^{3/2} \left(\frac{1}{M_{Ar}} + \frac{1}{M_v}\right)}}{{p \times \sigma_{12} \times \Omega}} \quad (24)$
+$`D_{vm} = \frac{{1.86 \times 10^{-3} T_m^{3/2} \left(\frac{1}{M_{Ar}} + \frac{1}{M_v}\right)}}{{p \times \sigma_{12} \times \Omega}} \quad (24)`$
 
 where $p$ is the process pressure in atm, $\sigma_{12}$ is the collisional diameter in Å, while $\Omega$ is a dimensionless factor that can be described according Lennard–Jones 12-6 potential. The temperature dependence of all these factors was taken into account by fitting the data reported in [[12]](#12) (Table 5.1-2, 5.1-3) for different temperature values.
 
