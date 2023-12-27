@@ -1,0 +1,29 @@
+[build-system]
+requires = [
+    "setuptools"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "DropletEvapModel"
+version = "0.0"
+authors = [
+    { name = "Tommaso Gallingani", email = "t.gallingani@gmail.com" }
+]
+description = "Droplet 0D evaporation model"
+readme = "README.rst"
+# requires-python = ">=3.7"
+
+dynamic = ["dependencies"]
+
+[tool.setuptools]
+zip-safe = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[project.scripts]
+# my_script = 'package_template.script_file:function'

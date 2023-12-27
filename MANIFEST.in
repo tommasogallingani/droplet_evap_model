@@ -1,0 +1,5 @@
+include requirements.txt
+include README.rst
+include LICENSE
+recursive-include package_template/queries *.sql
+global-exclude template_readme.md
