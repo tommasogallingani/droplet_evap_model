@@ -26,11 +26,9 @@ $
 \frac{{d m_d}}{{dt}} = -\dot{m}_d
 $
 
-$
-m_d \cdot c_{p_l} \frac{{dT_d}}{{dt}} = -Q_s
-$
+$m_d \cdot c_{p_l} \frac{{dT_d}}{{dt}} = -Q_s$
 
-where $m_d$ is the droplet mass, $ \dot{m}_d $ is the mass evaporation rate, $ c_{p_l} $ is the specific heat capacity of the liquid droplet, $T_d$ is the droplet temperature, and $Q_s$ is the net power transferred from the environment which contributes to droplet temperature increase.
+where $m_d$ is the droplet mass, $\dot{m}_d$ is the mass evaporation rate, $c_{p_l}$ is the specific heat capacity of the liquid droplet, $T_d$ is the droplet temperature, and $Q_s$ is the net power transferred from the environment which contributes to droplet temperature increase.
 
 Balance can be rewritten as a function of droplet diameter $D_d$, under the hypothesis of a spherical and homogeneous droplet:
 
