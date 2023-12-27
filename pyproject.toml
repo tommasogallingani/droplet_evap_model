@@ -5,7 +5,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "py-droplet-evap-model"
+name = "dropletevapmodel"
 version = "0.0"
 authors = [
     { name = "Tommaso Gallingani", email = "t.gallingani@gmail.com" }
