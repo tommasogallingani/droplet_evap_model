@@ -46,8 +46,8 @@ $
 
 where $D_v$ is the vapor diffusion coefficient, $\rho$ is the density, $Sh$ is the Sherwood number, and $B_M$ is the Spalding mass transfer number. It’s worth mentioning that all the physical properties were calculated in the region of gas-vapor film, considering the presence of both gas and water vapor species. Moreover, as described below, the temperature effect on the value of physical properties was included.
 
-![Schematic droplet evaporation](docs\source\_static\schema_droplet.jpg
-?raw=true "Schematic droplet evaporation")
+<img src="docs/source/_static/schema_droplet.jpg" alt="Schematic droplet evaporation" width="400"/>
+
 
 The Spalding mass transfer number can be calculated using Equation (5):
 
