@@ -125,7 +125,7 @@ In this perspective, droplet concentration can be obtained using scanning mobili
 
 Under the hypothesis, the gas mass for each volume unit ($mass_{Ar}$) can be calculated using the gas ideal law. For each time step of the simulation ($\Delta t$), water content ($\text{ppm}_i$) was updated considering the initial vapor concentration ($\text{ppm}_0$) and the mass evaporated from the droplet ($m_d$), as reported in Equation (25).
 
-$\text{ppm}_1 = \frac{{\text{ppm}_0 \cdot mass_{Ar} + m_d \cdot 10^6 \cdot \Delta t}}{{mass_{Ar}}} \quad \text{for } i=1 \ldots n  \quad (24) $
+$`\text{ppm}_1 = \frac{{\text{ppm}_0 \cdot mass_{Ar} + m_d \cdot 10^6 \cdot \Delta t}}{{mass_{Ar}}} \quad \text{for } i=1 \ldots n  \quad (25) `$
 
 ## Assumptions and Limitation of the Simulative Model
 
@@ -139,7 +139,7 @@ Firstly, the gas temperature during evaporation and droplet transport inside the
 According to literature, the heat transfer resistance inside an evaporating droplet is usually assumed to be negligible. To support this point, we compare the heat transfer resistance inside and outside the evaporating droplet using the Biot number ($Bi$). $Bi$ is a dimensionless number described as the ratio between the heat transfer inside the droplet and at the droplet surface. If $Bi$ < 1, then the internal body thermal resistance can be neglected, and the temperature field can be considered uniform. $Bi$ can be defined according to following equation and expressed as a function of $Nu$, introduced above:
 
 
-$\text{Bi} = \frac{L_0 \cdot h}{k_l} = \frac{\text{Nu}_m \cdot k_m}{k_l} \quad (25)$
+$\text{Bi} = \frac{L_0 \cdot h}{k_l} = \frac{\text{Nu}_m \cdot k_m}{k_l} \quad (26)$
 
 
 where $ L_0 $ is the characteristic length (r/3 for a sphere), $ h $ is the film heat transfer coefficient (W/m²K), and $ k_l $ is the thermal conductivity of the droplet. Even if all terms are temperature-dependent, the value of the Bi number is slightly affected by small thermal gradients. Indeed, at 293 K, the $Bi$ number for the tested condition is 0.066, significantly lower than 1. This result, in line with what has been already reported in literature [[9]](#9), outlines that the temperature gradient is much higher in the film region than in the droplet bulk, confirming that we can describe the droplet as a solid sphere with infinite thermal conductance.
