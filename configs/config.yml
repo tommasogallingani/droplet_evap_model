@@ -1,50 +1,17 @@
-modelling:
-  timestep: 0.00002
-  max_iteration: 1.0e+5
-environment:
-  pressure: 101325
-  pressure_atm: 101325
-  kb: 1.380649e-23
-  drop_conc: 1.0e+9
-t_zero:
-  d_zero: 23.3315e-6
-  t_d_zero: 293
-  t_g_zero: 293
-  water_content_g_zero: 0
-liquid:
-  rho_d: 1.0e+6
-  boiling_t: 373
-  cp_l: 4.186
-  mm_d: 18
-  sigma_d: 2.641
-  eps_fact: 809.1
-  speed_d: 32
-  viscosity_a: 4.7e-08
-  viscosity_b: 3.5333e-6
-  cp_a: 30.092
-  cp_b: 6.832514
-  cp_c: 6.793435
-  cp_d: -2.53448
-  cp_e: 0.082139
-  k_a: 7.7500e-05
-  k_b: 2.2550e-02
-  k_c: 4.8150e+00
-gas_phase:
-  mm_g: 39.948
-  sigma_g: 3.542
-  eps_fact: 93.3
-  r: 8.314
-  speed_g: 32
-  viscosity_a: 6.0971e-08
-  viscosity_b: 3.3267e-6
-  cp_a: 20.786
-  cp_b: 2.82591e-07
-  cp_c: -1.46419e-07
-  cp_d: 1.09213e-08 
-  cp_e: -3.66137e-9
-  k_a: -2.9107e-05
-  k_b: 6.8089e-02
-  k_c: -1.5000e-01
-output:
-  csv: true
-  plotting: true
+simulation_config:
+  modelling:
+    timestep: 0.00002
+    max_iteration: 1.0e+5
+  environment:
+    pressure: 101325
+    pressure_atm: 101325
+    kb: 1.380649e-23
+    drop_conc: 1.0e+9
+  t_zero:
+    d_zero: 23.3315e-6
+    t_d_zero: 293
+    t_g_zero: 293
+    water_content_g_zero: 0
+  output:
+    csv: true
+    plotting: true
