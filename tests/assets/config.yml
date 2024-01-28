@@ -1,0 +1,17 @@
+simulation_config:
+  modelling:
+    timestep: 0.00002
+    max_iteration: 1.0e+5
+  environment:
+    pressure: 101325
+    pressure_atm: 101325
+    kb: 1.380649e-23
+    drop_conc: 1.0e+9
+  t_zero:
+    d_zero: 23.3315e-6
+    t_d_zero: 293
+    t_g_zero: 293
+    water_content_g_zero: 0
+  output:
+    csv: true
+    plotting: true

@@ -272,6 +272,7 @@ class EvapModel():
         max_it = int(self.model.simulation_config.modelling.max_iteration)
         timestep = self.model.simulation_config.modelling.timestep
         logger.info('Starting modelling')
+        res[0]['time'] = 0
         for t in tqdm.tqdm(range(1, max_it)):
             # Calculate the state at the current timestamp
             res[t] = self.evaluate_state(res[t-1], self.sigma12, self.epsilon12, self.mass_g)
