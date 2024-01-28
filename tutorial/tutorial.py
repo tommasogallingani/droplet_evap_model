@@ -9,7 +9,7 @@ import yaml
 import argparse
 import matplotlib.pyplot as plt
 import tqdm
-from dropletevapmodel import setup_logger, load_config
+from dropletevapmodel import setup_logger, load_config, post_processing
 from dropletevapmodel import DropletEvapModel,EvapModel
 
 logger = setup_logger(
@@ -27,7 +27,13 @@ def main(args):
     if args.liq_type is not None:
         logger.info('Liquid parameters will be taken from csv database file')
         config['fluid_properties'] = pd.read_csv(os.path.join(args.data_path,'liq.csv'), index_col='property')[args.liq_type].to_dict()
-    EvapModel(model=DropletEvapModel(**config)).run()
+    
+    logger.info('Running model')
+    model = DropletEvapModel(**config)
+    res = EvapModel(model=model).run()
+    logger.info('Saving results')
+    # Post processing
+    post_processing(model=model, data=res, directory='res')
 
 
 if __name__ == '__main__':

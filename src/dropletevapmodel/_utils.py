@@ -8,17 +8,39 @@ import yaml
 import matplotlib.pyplot as plt
 
 
-def dump_csv(res:dict, directory:str):
-    df = pd.DataFrame.from_dict(res)
-    df.to_csv(os.path.join('output',directory,'res.csv'), index=False)
+def dump_csv(
+        res:dict,
+        directory:str
+    ) -> None:
+    """
+    Dump results to csv
 
-def plot_curves(res:dict, timestamp:float, directory:str):
+    :param res: (dict) results
+    :param directory: (str) directory name
+
+    """
+    df = pd.DataFrame.from_dict(res).T
+    df.to_csv(os.path.join('output',directory,'res.csv'), index=True)
+
+def plot_curves(
+        res:dict,
+        timestep:float,
+        directory:str
+    ) -> None:
+    """
+    Plot curves
+
+    :param res: (dict) results
+    :param timestep: (float) timestep
+    :param directory: (str) directory name
+
+    """
     time = []
     diameter = []
     temp = []
     ppm = []
     for key, val in res.items():
-        time.append(timestamp*key)
+        time.append(timestep*key)
         diameter.append(val['d_d'])
         temp.append(val['t_d'])
         ppm.append(val['ppm'])
@@ -30,7 +52,7 @@ def plot_curves(res:dict, timestamp:float, directory:str):
     ax1 = ax[0].twinx()
     ax1.scatter(x=time, y=temp, c='k', label='Droplet temperature')
     ax1.set_ylabel('Temperature (K)')
-    ev_c = -np.diff(np.power(np.array(diameter), 2))/timestamp
+    ev_c = -np.diff(np.power(np.array(diameter), 2))/timestep
     ax[1].scatter(x=time[1:], y=ev_c, c='r', label='Evaporation constant')
     ax[1].set_ylim((0, max(ev_c)))
     ax[1].set_ylabel('Evaporation constant (m^2/s)')
@@ -44,11 +66,17 @@ def plot_curves(res:dict, timestamp:float, directory:str):
     ax[2].set_xlabel('Time (s)')
     fig.legend()
     fig.savefig(os.path.join('output',directory,'plots.png'), dpi=300)
-    plt.draw()
-    plt.show()
 
 
-def load_config(path: str) -> dict:
+def load_config(
+        path: str
+        ) -> dict:
+    """
+    Load YAML configuration file
+    
+    :param path: (str) path to YAML configuration file
+    :return: (dict)
+    """
     path_config = Path(path)
     with open(path_config, 'r') as fp:
         config = yaml.load(fp, Loader=yaml.FullLoader)

@@ -17,6 +17,95 @@ pip install -e .
 
 ## How to use it
 
+### Data model 
+
+The model requires input data organized into three main sections: "fluid_properties," "gas_properties," and "simulation_config" Under "fluid_properties," parameters such as density (rho_d), boiling temperature (boiling_t), specific heat capacity (cp_l), molecular mass (mm_d), surface tension (sigma_d), and various coefficients related to heat capacity and thermal conductivity need to be specified. Similarly, the "gas_properties" section requires information on molecular mass (mm_g), surface tension (sigma_g), gas constant (r), speed (speed_g), and coefficients for heat capacity and thermal conductivity.
+
+The "simulation_config" section encompasses various configurations for the simulation. The simulation of droplet evaporation involves several configuration parameters that define the modeling, environmental conditions, initial states, and output preferences. Below is a description of each parameter within the `simulation_config` section:
+
+ 1. Modelling Configuration
+
+   - **Timestep (`timestep`):** The time increment used in each iteration of the simulation. It represents the duration between consecutive time steps during the model's execution.
+
+   - **Maximum Iterations (`max_iteration`):** The maximum number of iterations the simulation will run. This parameter controls the overall duration of the simulation.
+
+ 2. Environment Configuration
+
+   - **Pressure (`pressure`):** The pressure within the environment, specified in Pascals (Pa). It influences various thermodynamic properties of the system.
+
+   - **Atmospheric Pressure (`pressure_atm`):** The atmospheric pressure in Pascals (Pa) is the pressure exerted by the Earth's atmosphere at sea level.
+
+   - **Boltzmann Constant (`kb`):** The Boltzmann constant, a fundamental constant of nature, used in thermodynamic calculations. It is specified in joules per kelvin (J/K).
+
+   - **Droplet Concentration (`drop_conc`):** The initial concentration of droplets in the environment, typically given in droplets per unit volume.
+
+ 3. Initial Conditions (`t_zero`)
+
+   - **Initial Droplet Diameter (`d_zero`):** The initial diameter of the droplet at the start of the simulation, specified in meters (m).
+
+   - **Initial Droplet Temperature (`t_d_zero`):** The initial temperature of the droplet at the beginning of the simulation, specified in Kelvin (K).
+
+   - **Initial Gas Temperature (`t_g_zero`):** The initial temperature of the surrounding gas at the start of the simulation, specified in Kelvin (K).
+
+   - **Initial Water Content in Gas (`water_content_g_zero`):** The initial water content in the gas phase, specified in the form of mass fraction or other suitable units.
+
+ 4. Output Configuration
+
+   - **CSV Output (`csv`):** A boolean flag indicating whether to enable CSV output. If set to `true`, the simulation results will be exported to a CSV file.
+
+   - **Plotting Output (`plotting`):** A boolean flag indicating whether to enable plotting of simulation results. If set to `true`, the model will generate plots to visualize key variables and trends.
+
+These configuration parameters collectively define the settings and conditions under which the droplet evaporation simulation will be conducted. Adjusting these parameters allows users to tailor the simulation to their specific scenarios and study the behavior of droplet evaporation under different conditions.
+
+This structured data will be used as input to instantiate the "DropletEvapModel" Pydantic model, ensuring that all necessary parameters are defined and adhere to their respective constraints.
+
+### Use DropletEvapModel
+
+This guide explains how to use the `EvapModel` class for simulating droplet evaporation based on the `DropletEvapModel` Pydantic model. The provided Python code includes a simulation model, constants evaluation, and initialization parameters. Follow the steps below to utilize the `EvapModel` class effectively.
+
+#### Import Necessary Modules
+
+```python
+import tqdm
+import numpy as np
+from typing import Dict
+
+from ._utils import setup_logger
+from .models.phy_model import DropletEvapModel
+from .phy_utils import layer_temp, sat_pressure_g, vap_pressure_g, eval_omega, eval_diff_coeff, eval_vap_heat, eval_viscosity, eval_m_viscosity, eval_cp, eval_k, eval_phi
+
+```
+
+#### Load your DropletEvapModel instance
+
+```python
+model_config = {...}  # Your data
+model_instance = DropletEvapModel(**model_config)
+
+evap_model = EvapModel(model=model_instance)
+```
+
+#### Run the simulation
+
+```python
+evap_model.run()
+```
+
+#### Access the results
+
+
+```python
+results = evap_model.run()
+final_state = results[max(results.keys())]
+```
+
+## Available data
+Available data for liquid and gas materials are contained in liq.csv and gas.csv databased that
+can be found is configs folder.
+
+
+
+
 ## Technical backgroud
 
 

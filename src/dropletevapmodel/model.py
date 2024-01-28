@@ -1,16 +1,8 @@
-import pandas as pd
-import numpy as np
-import os
-from datetime import datetime
-from pathlib import Path
-import logging
-import logging.config
-import yaml
-import argparse
-import matplotlib.pyplot as plt
 import tqdm
 import numpy as np
-from ._utils import load_config, setup_logger, dump_csv, plot_curves
+from typing import Dict
+
+from ._utils import setup_logger
 from .models.phy_model import DropletEvapModel
 from .phy_utils import layer_temp, sat_pressure_g, vap_pressure_g, eval_omega, eval_diff_coeff, eval_vap_heat, eval_viscosity, eval_m_viscosity, eval_cp, eval_k, eval_phi
 
@@ -22,7 +14,10 @@ logger = setup_logger(
 
 
 class EvapModel():
-    def __init__(self, model:DropletEvapModel) -> None:
+    def __init__(
+            self,
+            model:DropletEvapModel
+        ) -> None:
         """
         Initialize the model
 
@@ -86,7 +81,13 @@ class EvapModel():
         return params
 
 
-    def evaluate_state(self, res_prec:dict, sigma12:float, epsilon12:float, mass_g:float):
+    def evaluate_state(
+            self,
+            res_prec:dict,
+            sigma12:float,
+            epsilon12:float,
+            mass_g:float
+        ) -> Dict:
         """
         Evaluate the state of the model at the current timestamp
 
@@ -259,21 +260,6 @@ class EvapModel():
         res['rh'] = res['pvap_g']/res['psat_g']
         return res
     
-    def post_process(self, res:dict, timestamp:float, directory:str):
-        if self.plotting or self.csv:
-            now = datetime.now()
-            dt_string = now.strftime("%Y%m%d_%H%M%S")
-            directory = 'res'+dt_string
-            if not os.path.exists(os.path.join('output',directory)):
-                os.makedirs(os.path.join('output',directory))
-            with open(os.path.join('output',directory,'config.yml'), 'w') as outfile:
-                yaml.dump(self.model.dict(), outfile, default_flow_style=False)
-        if self.csv:
-            logger.info('Dumping csv')
-            dump_csv(res=res, directory=directory)
-        if self.plotting:
-            logger.info('Plotting curves')
-            plot_curves(res=res, timestamp=timestamp, directory=directory)
 
     def run(self):
         """
@@ -284,24 +270,24 @@ class EvapModel():
         res[0] = self.init_params
         # Parameters initialization
         max_it = int(self.model.simulation_config.modelling.max_iteration)
-        timestamp = self.model.simulation_config.modelling.timestep
+        timestep = self.model.simulation_config.modelling.timestep
         logger.info('Starting modelling')
         for t in tqdm.tqdm(range(1, max_it)):
             # Calculate the state at the current timestamp
             res[t] = self.evaluate_state(res[t-1], self.sigma12, self.epsilon12, self.mass_g)
+            # Add time info
+            res[t]['time'] = t*timestep
+            # Check if the result is complex
             for k, v in res[t].items():
                 if isinstance(v, complex):
                     logger.warning(f"Found complex res for {k} variable at iteration {t} and timestamp {t*self.model['modelling']['timestep']}")
             # Break if the droplet diameter is negative or zero
             if res[t]['d_d'] <= 0 or res[t]['d_d'] == np.nan or res[t]['t_d'] <= 0:
-                logger.info(f'Estimated evaporation time of {t*timestamp} seconds')
+                logger.info(f'Estimated evaporation time of {t*timestep} seconds')
                 break
             # Max iteration reached
             if t==max_it-1:
                 logger.warning('Maximum number of iteration reached')
-        # Post processing
-        logger.info('Post processing')
-        self.post_process(res=res, timestamp=timestamp, directory='res')
         return res
 
 

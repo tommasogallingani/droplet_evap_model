@@ -23,7 +23,7 @@
             "args": [],
             "console": "integratedTerminal",
             "justMyCode": true,
-            "pythonPath": "C:\\Users\\tgall\\anaconda3\\envs\\dropletmodel310\\python.exe"
+            "python": "C:\\Users\\tgall\\anaconda3\\envs\\dropletmodel310\\python.exe"
 
         }
     ]
