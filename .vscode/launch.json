@@ -13,6 +13,18 @@
             "args": [],
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "test tutorial",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/tutorial/tutorial.py",
+            "cwd": "${workspaceFolder}",
+            "args": [],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "python": "C:\\Users\\tgall\\anaconda3\\envs\\dropletmodel310\\python.exe"
+
         }
     ]
 }
