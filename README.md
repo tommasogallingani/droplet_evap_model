@@ -108,7 +108,6 @@ can be found is configs folder.
 
 ## Technical backgroud
 
-
 The 0-D model used for the simulation of a single droplet evaporation was developed according to a diffusion model based on mass and energy balance well reported in literature [[1]](#1) [[2]](#2), following the classical evaporation model (CEM) proposed by Spalding [[3]](#3) and Godsave [[4]](#4). This model was further improved following Abramzon-Sirignano approach [[5]](#5) [[6]](#6), that enabled a better account for advective mass and energy transport. A detailed description of the governing equations and limitations of this model was recently reviewed by Pinheiro et al. [[7]](#7). Mass and energy balances can be described according to following equations, respectively:
 
 $\frac{{d m_d}}{{dt}} = -\dot{m}_d$
@@ -233,8 +232,10 @@ $\text{Bi} = \frac{L_0 \cdot h}{k_l} = \frac{\text{Nu}_m \cdot k_m}{k_l} \quad (
 
 where $ L_0 $ is the characteristic length (r/3 for a sphere), $ h $ is the film heat transfer coefficient (W/m²K), and $ k_l $ is the thermal conductivity of the droplet. Even if all terms are temperature-dependent, the value of the Bi number is slightly affected by small thermal gradients. Indeed, at 293 K, the $Bi$ number for the tested condition is 0.066, significantly lower than 1. This result, in line with what has been already reported in literature [[9]](#9), outlines that the temperature gradient is much higher in the film region than in the droplet bulk, confirming that we can describe the droplet as a solid sphere with infinite thermal conductance.
 
+A comprehensive discussion of a possible application of the model can be found in T. Gallingani 2020  [[20]](#20)
 
 # References
+
 <a id="1">[1]</a>
 Lefebvre A H and McDonell V G 2017 Atomization and sprays (CRC press)
 
@@ -291,3 +292,6 @@ Chen T M and Chein H M 2017 Generation and Evaluation of Mono
 
 <a id="19">[19]</a>
 Hinds W C 1999 Aerosol technology: properties, behavior, and measurement of airborne particles (John Wiley & Sons)
+
+<a id="20">[20]</a>
+Gallingani T 2020 (Alma Mater Studiorum)
