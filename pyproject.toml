@@ -6,12 +6,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dropletevapmodel"
-version = "0.0"
+version = "0.1"
 authors = [
     { name = "Tommaso Gallingani", email = "t.gallingani@gmail.com" }
 ]
 description = "Droplet 0D evaporation model"
-readme = "README.rst"
+readme = "README.md"
 # requires-python = ">=3.7"
 
 dynamic = ["dependencies"]
