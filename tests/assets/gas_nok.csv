@@ -1,0 +1,16 @@
+property,Ar
+mm_g,39.948
+sigma_g,3.542
+eps_fact,93.3
+r,8.314
+speed_g,50
+viscosity_a,6.10E-08
+viscosity_b,3.33E-06
+cp_a,20.786
+cp_b,2.83E-07
+cp_c,-1.46E-07
+cp_d,1.09E-08
+cp_e,-3.66E-09
+k_a,-2.91E-05
+k_b,0.068089
+k_c,-0.15

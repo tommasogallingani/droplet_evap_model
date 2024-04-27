@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dropletevapmodel"
-version = "0.1"
+version = "0.2.0"
 authors = [
     { name = "Tommaso Gallingani", email = "t.gallingani@gmail.com" }
 ]
