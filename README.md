@@ -69,12 +69,102 @@ This guide explains how to use the `EvapModel` class for simulating droplet evap
 import tqdm
 import numpy as np
 from typing import Dict
+from dropletevapmodel import EvapModel, DropletEvapModel
 
-from ._utils import setup_logger
-from .models.phy_model import DropletEvapModel
-from .phy_utils import layer_temp, sat_pressure_g, vap_pressure_g, eval_omega, eval_diff_coeff, eval_vap_heat, eval_viscosity, eval_m_viscosity, eval_cp, eval_k, eval_phi
 
 ```
+#### Prepare your data model
+
+```python
+
+model_config = {
+    'simulation_config': {
+        'modelling': {
+            'timestep': 2e-05, # seconds
+            'max_iteration': 100000.0 # number of iteration
+        },
+        'environment': {
+            'pressure': 101325, # Pa
+            'pressure_atm': 101325, # Pa
+            'kb': 1.380649e-23, # J⋅K−1⋅mol−1
+            'drop_conc': 1000000000.0 # number/cm3
+        },
+        't_zero': {
+            'd_zero': 2.33315e-05, # Droplet diameter at t0 in m
+            't_d_zero': 293, # Droplet temperature at t0 in K
+            't_g_zero': 293, # Gas temperature at t0 in K
+            'water_content_g_zero': 0 # Water content at t0 in ppm
+        },
+        'output': {
+            'csv': True,
+            'plotting': True
+        }
+    }
+}
+
+```
+
+Liquid and gas properties can be added using the available database or loading custom data. Gas information can be added updating the model config dict.
+
+```python
+
+model_config.update(
+  {
+    'gas_propeties': 
+      {
+      'mm_g': 39.948,  # g/mol
+      'sigma_g': 3.542,  # Angstrom
+      'eps_fact': 93.3,  # K
+      'r': 8.314,  # J/(mol*K)
+      'speed_g': 32.0,  # m/s
+      'viscosity_a': 6.1e-08,  # m^2/s
+      'viscosity_b': 3.33e-06,  # K
+      'cp_a': 20.786,  # J/mol
+      'cp_b': 2.83e-07,  # J/(mol*K)
+      'cp_c': -1.46e-07,  # J/(mol*K^2)
+      'cp_d': 1.09e-08,  # J/(mol*K^3)
+      'cp_e': -3.66e-09,  # J/(mol*K^4)
+      'k_a': -2.91e-05,  # W/(m*K)
+      'k_b': 0.068089,  # W/(m*K^2)
+      'k_c': -0.15  # W/(m*K^3)
+    }
+  }
+)
+
+```
+
+In the same way, liquid information can be added
+
+```python
+
+model_config.update(
+  {
+    'fluid_properties': 
+      {
+      'rho_d': 1000000.0,  # kg/m^3
+      'boiling_t': 373.0,  # K
+      'cp_l': 4.186,  # J/(g*K)
+      'mm_d': 18.0,  # g/mol
+      'sigma_d': 2.641,  # N/m
+      'eps_fact': 809.1,  # K
+      'speed_d': 32.0,  # m/s
+      'viscosity_a': 4.7e-08,  # m^2/s
+      'viscosity_b': 3.53e-06,  # K
+      'cp_a': 30.092,  # J/mol
+      'cp_b': 6.832514,  # J/(mol*K)
+      'cp_c': 6.793435,  # J/(mol*K^2)
+      'cp_d': -2.53448,  # J/(mol*K^3)
+      'cp_e': 0.082139,  # J/(mol*K^4)
+      'k_a': 7.75e-05,  # W/(m*K)
+      'k_b': 0.02255,  # W/(m*K^2)
+      'k_c': 4.815  # W/(m*K^3)
+  }
+
+  }
+)
+
+```
+
 
 #### Load your DropletEvapModel instance
 
@@ -122,7 +212,7 @@ $\frac{{dD_d}}{{dt}} = -\frac{{2 \dot{m}_d}}{{\pi \rho_l D_d^2}} \quad (3)$
 
 According to the CEM model, widely discussed and applied in different fields of research to study droplet evaporation, based on mass and energy balance evaporation flow rate can be described according to the following equation:
 
-$`\dot{m}_d = \pi D_d D_{vm} \rho_m Sh_m \ln(1 + B_M) \quad (4)`$
+$\dot{m}_d = \pi D_d D_{vm} \rho_m Sh_m \ln(1 + B_M) \quad (4)$
 
 where $D_v$ is the vapor diffusion coefficient, $\rho$ is the density, $Sh$ is the Sherwood number, and $B_M$ is the Spalding mass transfer number. It’s worth mentioning that all the physical properties were calculated in the region of gas-vapor film, considering the presence of both gas and water vapor species. Moreover, as described below, the temperature effect on the value of physical properties was included.
 
@@ -165,7 +255,7 @@ The correction factor $G$ can be expressed as a function of a non-dimensional ev
 
 $G = \frac{\beta}{{e^\beta - 1}} \quad (13)$
 
-$`\beta = -\frac{\dot{m}_d c_{p_m}}{2\pi k_m D_d} \quad (14)`$
+$\beta = -\frac{\dot{m}_d c_{p_m}}{2\pi k_m D_d} \quad (14)$
 
 As detailed in several publications by Abramzon and Sirignano [[5]](#5) [[6]](#6), a more realistic approach can be used taking more precisely into account mass and energy transport. In this perspective, modification to the CEM model was carried out using two different correction factors ($F_M$ and $F_T$), based on the film theory considering the effect of Stefan’s flows at the liquid-gas interface.
 
@@ -179,7 +269,7 @@ $B_T = \left(1 + B_M\right)^\phi \quad (17)$
 
 $\phi = \frac{c_{p_v}/c_{p_g} \cdot Sh/Nu \cdot 1/\text{Le}_m} \quad (18)$
 
-$`\text{Le}_m = \frac{{k_m}}{{c_{p_m} D_{vm} \rho_m}} \quad (19)`$
+$\text{Le}_m = \frac{{k_m}}{{c_{p_m} D_{vm} \rho_m}} \quad (19)$
 
 where $\text{Le}$ is Lewis number. The corrected value of $G$, $Sh^*$ and $Nu^*$ numbers that should be employed in Abramzon-Sirignano model are reported in the following equations:
 
@@ -199,7 +289,7 @@ $T_m = T_s + \alpha (T_g - T_s) \quad (23)$
 
 Vapor diffusion coefficient ($D_{vm}, \, \text{cm}^2/\text{s}$) were calculated following the approach reported by Cussler [[12]](#12) and proposed by Chapman and Enskog:
 
-$`D_{vm} = \frac{{1.86 \times 10^{-3} T_m^{3/2} \left(\frac{1}{M_{Ar}} + \frac{1}{M_v}\right)}}{{p \times \sigma_{12} \times \Omega}} \quad (24)`$
+$D_{vm} = \frac{{1.86 \times 10^{-3} T_m^{3/2} \left(\frac{1}{M_{Ar}} + \frac{1}{M_v}\right)}}{{p \times \sigma_{12} \times \Omega}} \quad (24)$
 
 where $p$ is the process pressure in atm, $\sigma_{12}$ is the collisional diameter in Å, while $\Omega$ is a dimensionless factor that can be described according Lennard–Jones 12-6 potential. The temperature dependence of all these factors was taken into account by fitting the data reported in [[12]](#12) (Table 5.1-2, 5.1-3) for different temperature values.
 
@@ -213,7 +303,7 @@ In this perspective, droplet concentration can be obtained using scanning mobili
 
 Under the hypothesis, the gas mass for each volume unit ($mass_{Ar}$) can be calculated using the gas ideal law. For each time step of the simulation ($\Delta t$), water content ($\text{ppm}_i$) was updated considering the initial vapor concentration ($\text{ppm}_0$) and the mass evaporated from the droplet ($m_d$), as reported in Equation (25).
 
-$`\text{ppm}_1 = \frac{{\text{ppm}_0 \cdot mass_{Ar} + m_d \cdot 10^6 \cdot \Delta t}}{{mass_{Ar}}} \quad \text{for } i=1 \ldots n  \quad (25) `$
+$\text{ppm}_1 = \frac{{\text{ppm}_0 \cdot mass_{Ar} + m_d \cdot 10^6 \cdot \Delta t}}{{mass_{Ar}}} \quad \text{for } i=1 \ldots n  \quad (25)$
 
 ## Assumptions and Limitation of the Simulative Model
 
