@@ -211,7 +211,7 @@ Balance can be rewritten as a function of droplet diameter $D_d$, under the hypo
 $\frac{{dD_d}}{{dt}} = -\frac{{2 \dot{m}_d}}{{\pi \rho_l D_d^2}} \quad (3)$
 
 According to the CEM model, widely discussed and applied in different fields of research to study droplet evaporation, based on mass and energy balance evaporation flow rate can be described according to the following equation:
-
+$\dot{m}_d$
 $\dot{m}_d = \pi D_d D_{vm} \rho_m Sh_m \ln{(1 + B_M)} \quad (4)$
 
 where $D_v$ is the vapor diffusion coefficient, $\rho$ is the density, $Sh$ is the Sherwood number, and $B_M$ is the Spalding mass transfer number. It’s worth mentioning that all the physical properties were calculated in the region of gas-vapor film, considering the presence of both gas and water vapor species. Moreover, as described below, the temperature effect on the value of physical properties was included.
