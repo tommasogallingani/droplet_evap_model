@@ -212,7 +212,7 @@ $\frac{{dD_d}}{{dt}} = -\frac{{2 \dot{m}_d}}{{\pi \rho_l D_d^2}} \quad (3)$
 
 According to the CEM model, widely discussed and applied in different fields of research to study droplet evaporation, based on mass and energy balance evaporation flow rate can be described according to the following equation:
 
-$\dot{m}_d = {\pi} \times D_{d} D_{vm} $
+$\dot{m}_d = {\pi} \times $
 
 $\dot{m}_d = {\pi} D_d D_{vm} \rho_m Sh_m \ln{(1 + B_M)} \quad (4)$
 
