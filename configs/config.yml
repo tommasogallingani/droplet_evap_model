@@ -1,6 +1,6 @@
 simulation_config:
   modelling:
-    timestep: 0.00002
+    timestep: 0.002
     max_iteration: 1.0e+5
   environment:
     pressure: 101325

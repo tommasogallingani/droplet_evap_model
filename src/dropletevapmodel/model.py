@@ -1,10 +1,13 @@
 import tqdm
 import numpy as np
 from typing import Dict
-
+from abc import abstractmethod
+from scipy.integrate import solve_ivp
+from functools import partial
 from ._utils import setup_logger
 from .models.phy_model import DropletEvapModel
 from .phy_utils import layer_temp, sat_pressure_g, vap_pressure_g, eval_omega, eval_diff_coeff, eval_vap_heat, eval_viscosity, eval_m_viscosity, eval_cp, eval_k, eval_phi
+# Import abtract method
 
 logger = setup_logger(
     'modelling_droplet_evaporation',
@@ -12,6 +15,12 @@ logger = setup_logger(
     config_path='configs/log.yml'
 )
 
+
+def eval_d_delta(t, d_d, diff_vm, rho_m_g, Shm_star, Bm, rho_d):
+    md = np.pi*d_d*1.0e-4*diff_vm * \
+        rho_m_g*Shm_star*np.log(1+Bm)
+    d_delta = -2*md/(np.pi*rho_d*(d_d)**2)
+    return d_delta
 
 class EvapModel():
     def __init__(
@@ -79,7 +88,7 @@ class EvapModel():
             params['ppm'], self.model.simulation_config.environment.pressure, self.model.gas_properties.mm_g, self.model.fluid_properties.mm_d)
         params['rh'] = params['pvap_g']/params['psat_g']
         return params
-
+    
 
     def evaluate_state(
             self,
@@ -182,6 +191,8 @@ class EvapModel():
         res['FM'] = (1+res['Bm'])**0.7*np.log(1+res['Bm'])/res['Bm']
         res['Shm_star'] = 2+(res['Shm']-2)/res['FM']
         # Mass losses
+        eval_d_delta_p = partial(eval_d_delta, diff_vm=res['diff_vm'], rho_m_g=res['rho_m_g'], Shm_star=res['Shm_star'], Bm=res['Bm'], rho_d=res_prec['rho_d'])
+        d_d = solve_ivp(eval_d_delta_p, [0, timestep], [res_prec['d_d']], t_eval=[timestep])
         res['md'] = np.pi*res_prec['d_d']*1.0e-4*res['diff_vm'] * \
             res['rho_m_g']*res['Shm_star']*np.log(1+res['Bm'])
         res['d_dt'] = -2*res['md']/(np.pi*res_prec['rho_d']*(res_prec['d_d'])**2)

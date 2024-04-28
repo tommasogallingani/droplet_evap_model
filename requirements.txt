@@ -2,6 +2,7 @@ pandas
 numpy
 matplotlib
 seaborn
+scipy
 Pyyaml
 tqdm
 pydantic
