@@ -204,7 +204,7 @@ $\frac{{d m_d}}{{dt}} = -\dot{m}_d \quad (1)$
 
 $m_d \cdot c_{p_l} \frac{{dT_d}}{{dt}} = -Q_s \quad (2)$
 
-where $m_d$ is the droplet mass, $\dot{m}_d$ is the mass evaporation rate, $c_{p_l}$ is the specific heat capacity of the liquid droplet, $T_d$ is the droplet temperature, and $Q_s$ is the net power transferred from the environment which contributes to droplet temperature increase.
+where $m_d$ is the droplet mass, $\dot{m}_d$ is the mass evaporation rate, ${c_p}_l$ is the specific heat capacity of the liquid droplet, $T_d$ is the droplet temperature, and $Q_s$ is the net power transferred from the environment which contributes to droplet temperature increase.
 
 Balance can be rewritten as a function of droplet diameter $D_d$, under the hypothesis of a spherical and homogeneous droplet:
 
@@ -212,9 +212,7 @@ $\frac{{dD_d}}{{dt}} = -\frac{{2 \dot{m}_d}}{{\pi \rho_l D_d^2}} \quad (3)$
 
 According to the CEM model, widely discussed and applied in different fields of research to study droplet evaporation, based on mass and energy balance evaporation flow rate can be described according to the following equation:
 
-$\dot{m}_d = {\pi} \times $
-
-$\dot{m}_d = {\pi} D_d D_{vm} \rho_m Sh_m \ln{(1 + B_M)} \quad (4)$
+$\dot{m}_d = {\pi} D_d D_v \rho_m Sh_m \ln{(1 + B_M)} \quad (4)$
 
 where $D_v$ is the vapor diffusion coefficient, $\rho$ is the density, $Sh$ is the Sherwood number, and $B_M$ is the Spalding mass transfer number. It’s worth mentioning that all the physical properties were calculated in the region of gas-vapor film, considering the presence of both gas and water vapor species. Moreover, as described below, the temperature effect on the value of physical properties was included.
 
@@ -257,7 +255,7 @@ The correction factor $G$ can be expressed as a function of a non-dimensional ev
 
 $G = \frac{\beta}{{e^\beta - 1}} \quad (13)$
 
-$\beta = -\frac{\dot{m}_d c_{p_m}}{2\pi k_m D_d} \quad (14)$
+$\beta = -\frac{\dot{m}_d {c_p}_m}{2\pi k_m D_d} \quad (14)$
 
 As detailed in several publications by Abramzon and Sirignano [[5]](#5) [[6]](#6), a more realistic approach can be used taking more precisely into account mass and energy transport. In this perspective, modification to the CEM model was carried out using two different correction factors ($F_M$ and $F_T$), based on the film theory considering the effect of Stefan’s flows at the liquid-gas interface.
 
@@ -271,7 +269,7 @@ $B_T = \left(1 + B_M\right)^\phi \quad (17)$
 
 $\phi = \frac{c_{p_v}/c_{p_g} \cdot Sh/Nu \cdot 1/\text{Le}_m} \quad (18)$
 
-$\text{Le}_m = \frac{{k_m}}{{c_{p_m} D_{vm} \rho_m}} \quad (19)$
+$\text{Le}_m = \frac{{k_m}}{{{c_p}_m D_v \rho_m}} \quad (19)$
 
 where $\text{Le}$ is Lewis number. The corrected value of $G$, $Sh^*$ and $Nu^*$ numbers that should be employed in Abramzon-Sirignano model are reported in the following equations:
 
@@ -305,7 +303,7 @@ In this perspective, droplet concentration can be obtained using scanning mobili
 
 Under the hypothesis, the gas mass for each volume unit ($mass_{Ar}$) can be calculated using the gas ideal law. For each time step of the simulation ($\Delta t$), water content ($\text{ppm}_i$) was updated considering the initial vapor concentration ($\text{ppm}_0$) and the mass evaporated from the droplet ($m_d$), as reported in Equation (25).
 
-$\text{ppm}_1 = \frac{{\text{ppm}_0 \cdot mass_{Ar} + m_d \cdot 10^6 \cdot \Delta t}}{{mass_{Ar}}} \quad \text{for } i=1 \ldots n  \quad (25)$
+$\text{ppm}_1 = \frac{{\text{ppm}_0 \cdot mass_Ar + m_d \cdot 10^6 \cdot \Delta t}}{{mass_Ar}} \quad \text{for } i=1 \ldots n  \quad (25)$
 
 ## Assumptions and Limitation of the Simulative Model
 
