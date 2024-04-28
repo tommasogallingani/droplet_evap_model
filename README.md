@@ -200,11 +200,11 @@ can be found is configs folder.
 
 The 0-D model used for the simulation of a single droplet evaporation was developed according to a diffusion model based on mass and energy balance well reported in literature [[1]](#1) [[2]](#2), following the classical evaporation model (CEM) proposed by Spalding [[3]](#3) and Godsave [[4]](#4). This model was further improved following Abramzon-Sirignano approach [[5]](#5) [[6]](#6), that enabled a better account for advective mass and energy transport. A detailed description of the governing equations and limitations of this model was recently reviewed by Pinheiro et al. [[7]](#7). Mass and energy balances can be described according to following equations, respectively:
 
-$\frac{{d m_d}}{{dt}} = -\dot{m}_d$
+$\frac{{d m_d}}{{dt}} = -\dot{m}_d \quad (1)$
 
-$m_d \cdot c_{p_l} \frac{{dT_d}}{{dt}} = -Q_s$
+$m_d \cdot c_{p_l} \frac{{dT_d}}{{dt}} = -Q_s \quad (2)$
 
-where $m_d$ is the droplet mass, $\dot{m}_d$ is the mass evaporation rate, $`c_{p_l}`$ is the specific heat capacity of the liquid droplet, $T_d$ is the droplet temperature, and $Q_s$ is the net power transferred from the environment which contributes to droplet temperature increase.
+where $m_d$ is the droplet mass, $\dot{m}_d$ is the mass evaporation rate, $c_{p_l}$ is the specific heat capacity of the liquid droplet, $T_d$ is the droplet temperature, and $Q_s$ is the net power transferred from the environment which contributes to droplet temperature increase.
 
 Balance can be rewritten as a function of droplet diameter $D_d$, under the hypothesis of a spherical and homogeneous droplet:
 
@@ -212,7 +212,7 @@ $\frac{{dD_d}}{{dt}} = -\frac{{2 \dot{m}_d}}{{\pi \rho_l D_d^2}} \quad (3)$
 
 According to the CEM model, widely discussed and applied in different fields of research to study droplet evaporation, based on mass and energy balance evaporation flow rate can be described according to the following equation:
 
-$\dot{m}_d = \pi D_d D_{vm} \rho_m Sh_m \ln(1 + B_M) \quad (4)$
+$\dot{m}_d = \pi D_d D_{vm} \rho_m Sh_m \ln{(1 + B_M)} \quad (4)$
 
 where $D_v$ is the vapor diffusion coefficient, $\rho$ is the density, $Sh$ is the Sherwood number, and $B_M$ is the Spalding mass transfer number. It’s worth mentioning that all the physical properties were calculated in the region of gas-vapor film, considering the presence of both gas and water vapor species. Moreover, as described below, the temperature effect on the value of physical properties was included.
 
