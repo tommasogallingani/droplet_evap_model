@@ -31,7 +31,7 @@ def plot_curves(
     Plot curves
 
     :param res: (dict) results
-    :param timestep: (float) timestep
+    :param timestep: (float) timestep (kept for API compatibility, no longer used for x-axis)
     :param directory: (str) directory name
 
     """
@@ -40,10 +40,13 @@ def plot_curves(
     temp = []
     ppm = []
     for key, val in res.items():
-        time.append(timestep*key)
+        time.append(val['time'])
         diameter.append(val['d_d'])
         temp.append(val['t_d'])
         ppm.append(val['ppm'])
+    time_arr = np.array(time)
+    diam_arr = np.array(diameter)
+    ev_c = -np.diff(np.power(diam_arr, 2)) / np.diff(time_arr)
     fig, ax = plt.subplots(3, 1, figsize=(25,10))
     ax[0].scatter(x=time, y=diameter, label='Diameter')
     ax[0].set_ylim((0, max(diameter)))
@@ -52,16 +55,15 @@ def plot_curves(
     ax1 = ax[0].twinx()
     ax1.scatter(x=time, y=temp, c='k', label='Droplet temperature')
     ax1.set_ylabel('Temperature (K)')
-    ev_c = -np.diff(np.power(np.array(diameter), 2))/timestep
-    ax[1].scatter(x=time[1:], y=ev_c, c='r', label='Evaporation constant')
+    ax[1].scatter(x=time_arr[1:], y=ev_c, c='r', label='Evaporation constant')
     ax[1].set_ylim((0, max(ev_c)))
     ax[1].set_ylabel('Evaporation constant (m^2/s)')
     ax[1].set_xlabel('Time (s)')
     ax2 = ax[1].twinx()
     ax2.scatter(x=time, y=ppm, c='g', label='Water content ppm')
     ax2.set_ylabel('Water content (ppm)')
-    ax[2].scatter(x=time, y=np.power(np.array(diameter), 2), c='y', label='D-square')
-    ax[2].set_ylim((0, max(np.power(np.array(diameter), 2))))
+    ax[2].scatter(x=time, y=np.power(diam_arr, 2), c='y', label='D-square')
+    ax[2].set_ylim((0, max(np.power(diam_arr, 2))))
     ax[2].set_ylabel('Squared diameter (m^2)')
     ax[2].set_xlabel('Time (s)')
     fig.legend()
