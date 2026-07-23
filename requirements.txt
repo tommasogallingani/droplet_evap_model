@@ -5,3 +5,4 @@ seaborn
 Pyyaml
 tqdm
 pydantic
+scipy
